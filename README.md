@@ -47,6 +47,8 @@ This will result in the clang compiler being invoked with the following args:
 | artifact        | compiler arguments                                                           |
 | --------------- | ---------------------------------------------------------------------------- |
 | armv7-generic   | `--target=armv7-linux-gnueabihf -mcpu=generic             -mtune=generic`    |
-| pi4             | `--target=armv7-linux-gnueabihf -mcpu=cortex-a72+nocrypto -mtune=cortex-a72` |
+| pi4             | `--target=armv7-linux-gnueabihf -mcpu=cortex-a72+nocrypto -mtune=cortex-a72`[^1] |
 | aarch64-generic | `--target=aarch64-linux-gnu     -mcpu=generic             -mtune=generic`    |
-| pi4-64          | `--target=aarch64-linux-gnu     -mcpu=cortex-a72+nocrypto -mtune=cortex-a72` |
+| pi4-64          | `--target=aarch64-linux-gnu     -mcpu=cortex-a72+nocrypto -mtune=cortex-a72`[^1] |
+
+[^1]: The CPU of the Raspberry Pi 4 is a Cortex-A72. `+nocrypto` is specified for `-mcpu` because the A72 in the Pi 4 is (_apparently_) the only A72 in the world that doesn't support cryptography instructions: https://github.com/ardera/flutter-ci/issues/3#issuecomment-1272330857
