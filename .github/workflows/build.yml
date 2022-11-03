@@ -141,7 +141,7 @@ jobs:
       - name: Prune git history
         if: ${{ steps.stamp-cache.outputs.cache-hit != 'true' }}
         shell: bash
-        working-directory: engine
+        working-directory: engine/src
         run: |
           for FILE in $(find . -type d -name .git)
           do
