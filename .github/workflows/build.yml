@@ -266,7 +266,7 @@ jobs:
             ${{ github.workspace }}/engine/src/out/build/dart-sdk.version
   
   build-gen-snapshot-only:
-    name: 'build gen_snapshot only'
+    name: 'build gen_snapshot only for macOS'
     runs-on: macos-latest
     needs: populate-engine-src-cache
     strategy:
@@ -274,6 +274,9 @@ jobs:
         runtime-mode:
           - profile
           - release
+        cpu:
+          - arm
+          - arm64
     steps:
       - uses: actions/checkout@v3
 
@@ -308,7 +311,7 @@ jobs:
         if: ${{ matrix.has-gen-snapshot == true }}
         uses: actions/upload-artifact@v3
         with:
-          name: macos-gensnapshot-${{ matrix.runtime-mode }}
+          name: ${{ matrix-cpu }}-macos-gensnapshot-${{ matrix.runtime-mode }}
           path: |
             ${{ github.workspace }}/engine/src/out/build/compile_commands.json
             ${{ github.workspace }}/engine/src/out/build/clang_x64/gen_snapshot
@@ -326,6 +329,21 @@ jobs:
           - pi4-64
           - armv7-generic
           - aarch64-generic
+        include:
+          # Pi 4 is a Cortex-A72, but doesn't support cryptography instructions.
+          # Use -mcpu=cortex-a72+nocrypto -mtune=cortex-a72
+          - artifact-name: pi4
+            cpu: arm
+
+          - artifact-name: pi4-64
+            cpu: arm64
+          
+          # Use -mcpu=generic -mtune=generic for the generic builds.
+          - artifact-name: armv7-generic
+            cpu: arm
+            
+          - artifact-name: aarch64-generic
+            cpu: arm64
     steps:
       - uses: actions/checkout@v3
       
@@ -350,12 +368,12 @@ jobs:
       
       - uses: actions/download-artifact@v3
         with:
-          name: macos-gensnapshot-profile
+          name: ${{ matrix.cpu }}-macos-gensnapshot-profile
           path: macos-gensnapshot-release
         
       - uses: actions/download-artifact@v3
         with:
-          name: macos-gensnapshot-release
+          name: ${{ matrix.cpu }}-macos-gensnapshot-release
           path: macos-gensnapshot-release
           
       - name: Package artifacts
