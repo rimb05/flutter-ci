@@ -40,7 +40,7 @@ runs:
       id: depot-tools-in-path
       shell: bash
       run: |
-        (which gclient && echo '::set-output name=found::true') || echo '::set-output name=found::false'
+        (which gclient && echo 'found=true' >> $GITHUB_OUTPUT) || echo 'found=false' >> $GITHUB_OUTPUT
       
     - name: Clone depot tools
       if: ${{ steps.depot-tools-in-path.outputs.found == 'false' }}
@@ -68,13 +68,8 @@ runs:
       with:
         path: engine
         key: engine-${{ inputs.ref }}
-
-    - name: Check if downloading engine sources succeeded
-      if: ${{ steps.cache.outputs.cache-hit == 'false' }}
-      uses: actions/github-script@v3
-      with:
-        script: |
-          core.setFailed('Could not find cached engine source!')
+        enableCrossOsArchive: true
+        fail-on-cache-miss: true
 
     - name: Apply patch "Fix armv7 build"
       shell: bash
