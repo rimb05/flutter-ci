@@ -13,7 +13,9 @@ on:
 jobs:
   populate-engine-src-cache:
     name: 'Prepopulate engine source cache'
-    runs-on: ubuntu-latest
+    runs-on: 
+      - ubuntu-latest
+      - macos-latest
 
     steps:
       - uses: actions/checkout@v3
@@ -41,8 +43,7 @@ jobs:
         id: cache-lookup
         with:
           path: engine
-          key: engine-${{ steps.engine-version-stable.outputs.hash }}
-          enableCrossOsArchive: true
+          key: engine-${{ runner.os }}-${{ runner.arch }}-${{ steps.engine-version-stable.outputs.hash }}
           lookup-only: true
 
       - name: Log cache hit
@@ -55,8 +56,7 @@ jobs:
         if: ${{ steps.cache-lookup.outputs.cache-hit != 'true' }}
         with:
           path: engine
-          key: engine-${{ steps.engine-version-stable.outputs.hash }}
-          enableCrossOsArchive: true
+          key: engine-${{ runner.os }}-${{ runner.arch }}-${{ steps.engine-version-stable.outputs.hash }}
 
       - name: Setup environment variables
         if: ${{ steps.cache-lookup.outputs.cache-hit != 'true' }}

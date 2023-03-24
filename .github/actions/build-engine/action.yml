@@ -67,8 +67,7 @@ runs:
       id: cache
       with:
         path: engine
-        key: engine-${{ inputs.ref }}
-        enableCrossOsArchive: true
+        key: engine-${{ runner.os }}-${{ runner.arch }}-${{ inputs.ref }}
         fail-on-cache-miss: true
 
     - name: Apply patch "Fix armv7 build"
