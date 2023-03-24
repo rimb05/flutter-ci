@@ -30,6 +30,9 @@ inputs:
   additional-raw-gn-args:
     description: 'Additional lines to be appended to the generated args.gn file.'
     required: false
+  ninja-target:
+    description: 'Build target, appended to the ninja invocation.'
+    required: false
 runs:
   using: "composite"
   steps:
@@ -135,4 +138,4 @@ runs:
       shell: bash
       working-directory: engine/src/out/build
       run: |
-        ninja
+        ninja ${{ inputs.ninja-target }}

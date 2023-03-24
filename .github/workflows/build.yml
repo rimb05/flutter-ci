@@ -262,6 +262,56 @@ jobs:
             ${{ github.workspace }}/engine/src/out/build/engine.version
             ${{ github.workspace }}/engine/src/out/build/dart-sdk.version
   
+  build-gen-snapshot-only:
+    name: 'build gen_snapshot only'
+    runs-on: macos-latest
+    needs: populate-engine-src-cache
+    strategy:
+      matrix:
+        runtime-mode:
+          - profile
+          - release
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Read stable engine version
+        id: engine-version-stable
+        run: echo "hash=$(cat engine.version.stable | tr -dc [:xdigit:])" >> $GITHUB_OUTPUT
+
+      - name: Log engine version
+        run: |
+          echo *** engine version: ***
+          echo ${{ steps.engine-version-stable.outputs.hash }}
+
+      - name: Build gen_snapshot
+        uses: ./.github/actions/build-engine
+        with:
+          ref: "${{ steps.engine-version-stable.outputs.hash  }}"
+          is-host: false
+          runtime-mode: ${{ matrix.runtime-mode }}
+          os: linux
+          cpu: ${{ matrix.cpu }}
+          additional-gn-args: '--embedder-for-target --disable-desktop-embeddings --no-build-glfw-shell --no-build-embedder-examples --no-goma'
+          ninja-target: clang_x64/gen_snapshot
+      
+      - name: Add engine.version and dart-sdk.version file
+        run: |
+          cp engine.version.stable ${{ github.workspace }}/engine/src/out/build/engine.version
+          pushd ${{ github.workspace }}/engine/src/third_party/dart
+          git rev-parse HEAD > ${{ github.workspace }}/engine/src/out/build/dart-sdk.version
+          popd
+      
+      - name: Upload artifacts
+        if: ${{ matrix.has-gen-snapshot == true }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: macos-gensnapshot-${{ matrix.runtime-mode }}
+          path: |
+            ${{ github.workspace }}/engine/src/out/build/compile_commands.json
+            ${{ github.workspace }}/engine/src/out/build/clang_x64/gen_snapshot
+            ${{ github.workspace }}/engine/src/out/build/engine.version
+            ${{ github.workspace }}/engine/src/out/build/dart-sdk.version
+
   package:
     name: 'Package artifacts'
     runs-on: ubuntu-latest
@@ -294,6 +344,16 @@ jobs:
         with:
           name: ${{ matrix.artifact-name }}-release
           path: release
+      
+      - uses: actions/download-artifact@v3
+        with:
+          name: macos-gensnapshot-profile
+          path: macos-gensnapshot-release
+        
+      - uses: actions/download-artifact@v3
+        with:
+          name: macos-gensnapshot-release
+          path: macos-gensnapshot-release
           
       - name: Package artifacts
         run: |
@@ -309,6 +369,8 @@ jobs:
           cp ../debug/dart-sdk.version ./dart-sdk.version
           cp ../profile/clang_x64/gen_snapshot ./gen_snapshot_linux_x64_profile
           cp ../release/clang_x64/gen_snapshot ./gen_snapshot_linux_x64_release
+          cp ../macos-gensnapshot-profile ./gen_snapshot_macos_x64_profile
+          cp ../macos-gensnapshot-release ./gen_snapshot_macos_x64_release
           XZ_DEFAULTS="-T 0" tar -cJvf ../${{ matrix.artifact-name }}.tar.xz *
       
       - name: Upload artifacts
