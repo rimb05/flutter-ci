@@ -311,7 +311,7 @@ jobs:
         if: ${{ matrix.has-gen-snapshot == true }}
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix-cpu }}-macos-gensnapshot-${{ matrix.runtime-mode }}
+          name: ${{ matrix.cpu }}-macos-gensnapshot-${{ matrix.runtime-mode }}
           path: |
             ${{ github.workspace }}/engine/src/out/build/compile_commands.json
             ${{ github.workspace }}/engine/src/out/build/clang_x64/gen_snapshot
