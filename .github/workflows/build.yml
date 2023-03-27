@@ -312,7 +312,7 @@ jobs:
           runtime-mode: ${{ matrix.runtime-mode }}
           os: linux
           cpu: ${{ matrix.cpu }}
-          additional-gn-args: '--embedder-for-target --disable-desktop-embeddings --no-build-glfw-shell --no-build-embedder-examples --no-goma'
+          additional-gn-args: '--embedder-for-target --disable-desktop-embeddings --no-build-glfw-shell --no-build-embedder-examples --no-goma --no-prebuilt-dart-sdk'
           ninja-target: clang_x64/gen_snapshot
       
       - name: Add engine.version and dart-sdk.version file
