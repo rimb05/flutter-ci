@@ -147,7 +147,7 @@ jobs:
         shell: bash
         working-directory: engine/src/flutter
         run: |
-          git am ../../../0001-disable-metal-on-macos-linux-crossbuild.patch
+          git am ../../../0001-fix-linux-crossbuild-on-macos.patch
 
       - name: Install linux arm sysroot
         if: ${{ steps.cache-lookup.outputs.cache-hit != 'true' }}

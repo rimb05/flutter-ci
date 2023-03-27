@@ -1,0 +1,39 @@
+From 189c9223975e6578db2967a7d9d29b719ab452b9 Mon Sep 17 00:00:00 2001
+From: Hannes Winkler <hanneswinkler2000@web.de>
+Date: Mon, 27 Mar 2023 15:10:15 +0200
+Subject: [PATCH] fix linux crossbuild on macos
+
+---
+ shell/platform/embedder/BUILD.gn | 2 +-
+ tools/gn                         | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/shell/platform/embedder/BUILD.gn b/shell/platform/embedder/BUILD.gn
+index 9f61e97a3b0..dbb4a2bee7d 100644
+--- a/shell/platform/embedder/BUILD.gn
++++ b/shell/platform/embedder/BUILD.gn
+@@ -503,7 +503,7 @@ group("flutter_engine") {
+   }
+ }
+ 
+-if (is_mac) {
++if (is_mac && !embedder_for_target) {
+   zip_bundle("flutter_embedder_framework_archive") {
+     deps = [ ":generate_symlinks" ]
+     output = "$full_platform_name/FlutterEmbedder.framework.zip"
+diff --git a/tools/gn b/tools/gn
+index 21e2c2af0e6..47158e29936 100755
+--- a/tools/gn
++++ b/tools/gn
+@@ -435,7 +435,7 @@ def to_gn_args(args):
+   else:
+     gn_args['skia_use_gl'] = args.target_os != 'fuchsia'
+ 
+-  if sys.platform == 'darwin' and args.target_os not in ['android', 'fuchsia']:
++  if sys.platform == 'darwin' and args.target_os not in ['android', 'fuchsia', 'linux']:
+     # OpenGL is deprecated on macOS > 10.11.
+     # This is not necessarily needed but enabling this until we have a way to
+     # build a macOS metal only shell and a gl only shell.
+-- 
+2.37.2
+
