@@ -1,13 +1,35 @@
-From 189c9223975e6578db2967a7d9d29b719ab452b9 Mon Sep 17 00:00:00 2001
+From 318abd71ef1a2a6352f6bd074522f87c10a6ce28 Mon Sep 17 00:00:00 2001
 From: Hannes Winkler <hanneswinkler2000@web.de>
 Date: Mon, 27 Mar 2023 15:10:15 +0200
 Subject: [PATCH] fix linux crossbuild on macos
 
 ---
- shell/platform/embedder/BUILD.gn | 2 +-
- tools/gn                         | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ build/archives/BUILD.gn          | 10 ++++++----
+ shell/platform/embedder/BUILD.gn |  2 +-
+ tools/gn                         |  2 +-
+ 3 files changed, 8 insertions(+), 6 deletions(-)
 
+diff --git a/build/archives/BUILD.gn b/build/archives/BUILD.gn
+index 023cafdffee..70cfd752545 100644
+--- a/build/archives/BUILD.gn
++++ b/build/archives/BUILD.gn
+@@ -294,10 +294,12 @@ if (is_mac) {
+     ]
+   }
+ 
+-  group("flutter_embedder_framework") {
+-    deps = [
+-      "//flutter/shell/platform/embedder:flutter_embedder_framework_archive",
+-    ]
++  if (!embedder_for_target) {
++    group("flutter_embedder_framework") {
++      deps = [
++        "//flutter/shell/platform/embedder:flutter_embedder_framework_archive",
++      ]
++    }
+   }
+ }
+ 
 diff --git a/shell/platform/embedder/BUILD.gn b/shell/platform/embedder/BUILD.gn
 index 9f61e97a3b0..dbb4a2bee7d 100644
 --- a/shell/platform/embedder/BUILD.gn

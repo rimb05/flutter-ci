@@ -76,6 +76,12 @@ runs:
       run: |
         git apply $GITHUB_WORKSPACE/0001-fix-armv7-build.patch
     
+    - name: Apply patch "Fix linux crossbuild on MacOS"
+      shell: bash
+      working-directory: engine/src/flutter
+      run: |
+        git apply $GITHUB_WORKSPACE/0001-fix-linux-crossbuild-on-macos.patch
+    
     - name: Show git status
       shell: bash
       working-directory: engine/src
