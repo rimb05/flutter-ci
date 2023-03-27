@@ -477,7 +477,9 @@ jobs:
       matrix:
         artifact-name:
           - pi4
+          - pi4-64
           - armv7-generic
+          - aarch64-generic
         runtime-mode:
           - debug
           - profile
