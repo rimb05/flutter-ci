@@ -1,0 +1,25 @@
+From 256a65399627b0d962e7b572cbfe3aa32bc10469 Mon Sep 17 00:00:00 2001
+From: Hannes Winkler <hanneswinkler2000@web.de>
+Date: Mon, 27 Mar 2023 15:10:15 +0200
+Subject: [PATCH] disable metal on macos --> linux crossbuild
+
+---
+ tools/gn | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/gn b/tools/gn
+index 21e2c2af0e6..47158e29936 100755
+--- a/tools/gn
++++ b/tools/gn
+@@ -435,7 +435,7 @@ def to_gn_args(args):
+   else:
+     gn_args['skia_use_gl'] = args.target_os != 'fuchsia'
+ 
+-  if sys.platform == 'darwin' and args.target_os not in ['android', 'fuchsia']:
++  if sys.platform == 'darwin' and args.target_os not in ['android', 'fuchsia', 'linux']:
+     # OpenGL is deprecated on macOS > 10.11.
+     # This is not necessarily needed but enabling this until we have a way to
+     # build a macOS metal only shell and a gl only shell.
+-- 
+2.37.2
+

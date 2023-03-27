@@ -142,6 +142,13 @@ jobs:
         run: |
           git am ../../0001-allow-downloading-linux-sysroot-on-darwin.patch
 
+      - name: Fix macos-linux crossbuild
+        if: ${{ steps.cache-lookup.outputs.cache-hit != 'true' }}
+        shell: bash
+        working-directory: engine/src/flutter
+        run: |
+          git am ../../../0001-disable-metal-on-macos-linux-crossbuild.patch
+
       - name: Install linux arm sysroot
         if: ${{ steps.cache-lookup.outputs.cache-hit != 'true' }}
         shell: bash
