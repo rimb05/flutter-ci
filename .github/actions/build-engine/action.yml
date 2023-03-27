@@ -82,10 +82,15 @@ runs:
       run: |
         git apply $GITHUB_WORKSPACE/0001-fix-linux-crossbuild-on-macos.patch
     
-    - name: Show git status
+    - name: Log git status
       shell: bash
       working-directory: engine/src
-      run: git status
+      run: |
+        echo '*** buildroot git status: ***'
+        git status
+        echo '*** flutter engine git status: ***'
+        cd flutter
+        git status
     
     - name: Configure engine (host)
       if: ${{ inputs.is-host == 'true' }}
@@ -95,6 +100,7 @@ runs:
         ./src/flutter/tools/gn \
           --runtime-mode ${{ inputs.runtime-mode }} \
           --target-dir build \
+          --verbose \
           ${{ inputs.additional-gn-args }}
 
     - name: Configure engine (cross, not linux armhf)
@@ -107,6 +113,7 @@ runs:
           --target-os ${{ inputs.os }} \
           --${{ inputs.os }}-cpu ${{ inputs.cpu }} \
           --target-dir build \
+          --verbose \
           ${{ inputs.additional-gn-args }}
 
     - name: Configure engine (cross, linux armhf)
@@ -121,6 +128,7 @@ runs:
           --${{ inputs.os }}-cpu ${{ inputs.cpu }} \
           --arm-float-abi hard \
           --target-dir build \
+          --verbose \
           ${{ inputs.additional-gn-args }}
     
     - name: Append raw gn args

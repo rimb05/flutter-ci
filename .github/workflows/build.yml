@@ -301,7 +301,7 @@ jobs:
 
       - name: Log engine version
         run: |
-          echo *** engine version: ***
+          echo '*** engine version: ***'
           echo ${{ steps.engine-version-stable.outputs.hash }}
 
       - name: Build gen_snapshot
