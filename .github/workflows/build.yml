@@ -135,12 +135,26 @@ jobs:
         run: |
           gclient sync --revision src/flutter@${{ steps.engine-version-stable.outputs.hash }} -R -D
       
+      - name: Allow downloading sysroot on macos
+        if: ${{ steps.cache-lookup.outputs.cache-hit != 'true' }}
+        shell: bash
+        working-directory: engine
+        run: |
+          git am ../0001-allow-downloading-linux-sysroot-on-darwin.patch
+
       - name: Install linux arm sysroot
         if: ${{ steps.cache-lookup.outputs.cache-hit != 'true' }}
         shell: bash
         working-directory: engine
         run: |
           ./src/build/linux/sysroot_scripts/install-sysroot.py --arch=arm
+      
+      - name: Install linux arm64 sysroot
+        if: ${{ steps.cache-lookup.outputs.cache-hit != 'true' }}
+        shell: bash
+        working-directory: engine
+        run: |
+          ./src/build/linux/sysroot_scripts/install-sysroot.py --arch=arm64
 
       - name: Prune git history
         if: ${{ steps.cache-lookup.outputs.cache-hit != 'true' }}
