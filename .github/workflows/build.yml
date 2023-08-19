@@ -417,8 +417,9 @@ jobs:
 
         # use git apply instead of git am to avoid `Committer identity unknown` error
         run: |
-          git apply $GITHUB_WORKSPACE/0001-fix-armv7-build-make-arm64-tune-work.patch
-          git apply $GITHUB_WORKSPACE/0002-always-include-debug-symbols.patch
+          git apply $GITHUB_WORKSPACE/0001-allow-downloading-linux-sysroot-on-darwin.patch
+          git apply $GITHUB_WORKSPACE/0002-fix-armv7-build-make-arm64-tune-work.patch
+          git apply $GITHUB_WORKSPACE/0003-always-include-debug-symbols.patch
       
       - name: Show git status
         working-directory: engine/src
