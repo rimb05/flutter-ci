@@ -56,7 +56,7 @@ This will result in the clang compiler being invoked with the following args:
 | pi3             | `--target=armv7-linux-gnueabihf    -mcpu=cortex-a53          -mtune=cortex-a53` |
 | aarch64-generic | `--target=aarch64-linux-gnu        -mcpu=generic             -mtune=generic`    |
 | pi4-64          | `--target=aarch64-linux-gnu        -mcpu=cortex-a72+nocrypto -mtune=cortex-a72`[^1] |
-| pi3-64          | `--target=aarch64-linux-gnu        -mcpu=generic             -mtune=generic` |
+| pi3-64          | `--target=aarch64-linux-gnu        -mcpu=cortex-a53          -mtune=cortex-a53` |
 | x64-generic     | `--target=x86_64-unknown-linux-gnu -mcpu=generic             -mtune=generic` |
 
 ## Debug Symbols
