@@ -33,7 +33,7 @@ arm_tune = "generic"
 
 When tuning for pi 3:
 ```
-arm_cpu = "cortex-a53"
+arm_cpu = "cortex-a53+nocrypto"
 arm_tune = "cortex-a53"
 ```
 
@@ -53,10 +53,10 @@ This will result in the clang compiler being invoked with the following args:
 | --------------- | ---------------------------------------------------------------------------- |
 | armv7-generic   | `--target=armv7-linux-gnueabihf    -mcpu=generic             -mtune=generic`    |
 | pi4             | `--target=armv7-linux-gnueabihf    -mcpu=cortex-a72+nocrypto -mtune=cortex-a72`[^1] |
-| pi3             | `--target=armv7-linux-gnueabihf    -mcpu=cortex-a53          -mtune=cortex-a53` |
+| pi3             | `--target=armv7-linux-gnueabihf    -mcpu=cortex-a53+nocrypto -mtune=cortex-a53`[^3] |
 | aarch64-generic | `--target=aarch64-linux-gnu        -mcpu=generic             -mtune=generic`    |
 | pi4-64          | `--target=aarch64-linux-gnu        -mcpu=cortex-a72+nocrypto -mtune=cortex-a72`[^1] |
-| pi3-64          | `--target=aarch64-linux-gnu        -mcpu=cortex-a53          -mtune=cortex-a53` |
+| pi3-64          | `--target=aarch64-linux-gnu        -mcpu=cortex-a53+nocrypto -mtune=cortex-a53`[^3] |
 | x64-generic     | `--target=x86_64-unknown-linux-gnu -mcpu=generic             -mtune=generic` |
 
 ## Debug Symbols
@@ -78,5 +78,7 @@ objcopy --strip-unneeded libflutter_engine.so
 ```
 
 [^1]: The CPU of the Raspberry Pi 4 is a Cortex-A72. `+nocrypto` is specified for `-mcpu` because the A72 in the Pi 4 is (_apparently_) the only A72 in the world that doesn't support cryptography instructions: https://github.com/ardera/flutter-ci/issues/3#issuecomment-1272330857
+
+[^3]: Pi 3 doesn't support cryptography extensions either.
 
 [^2]: `--arm-float-abi hard` is only specified when building for armv7, `--unoptimized` is only specified for unoptimized debug builds.
