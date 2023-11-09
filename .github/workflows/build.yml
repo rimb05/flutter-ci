@@ -378,8 +378,9 @@ jobs:
             cpu: x64
             gen-snapshot-path: gen_snapshot
           
-          - os: ubuntu-latest
-            # artifact-name: universal
+          # One-off job for building the universal artifacts.
+          - artifact-name: universal
+            os: ubuntu-latest
             # flavor:
             # unoptimized:
             # runtime-mode:
