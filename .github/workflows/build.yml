@@ -362,7 +362,7 @@ jobs:
           
           - artifact-name: x64-generic
             cpu: x64
-            gen-snapshot-path: gen_snapshot
+            gen-snapshot-path: clang_x64/gen_snapshot
           
           # One-off job for building the universal artifacts.
           - artifact-name: universal
