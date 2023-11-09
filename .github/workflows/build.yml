@@ -83,8 +83,15 @@ jobs:
 
   populate-engine-src-cache:
     name: 'Prepopulate engine source cache'
-    runs-on: [ ubuntu-latest, macos-latest ]
+    runs-on: ${{ matrix.os }}
     needs: resolve-version
+    
+    # run on macos and linux.
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
 
     steps:
       - uses: actions/checkout@v3
@@ -402,7 +409,8 @@ jobs:
           echo *** engine version: ***
           echo ${{ needs.resolve-version.outputs.engine-hash }}
           echo '*** build config: ***'
-          echo os: ${{ matrix.os }}
+          echo matrix.os: ${{ matrix.os }}
+          echo runner.os: ${{ runner.os }}
           echo artifact name: ${{ matrix.artifact-name }}
           echo flavor: ${{ matrix.flavor }}
           echo runtime-mode: ${{ matrix.runtime-mode }}
@@ -562,7 +570,7 @@ jobs:
           pushd pkg-gen-snapshot
           cp $BUILD_DIR/${{ matrix.gen-snapshot-path }} $BUILD_DIR/compile_commands.json .
           
-          tar -cJvf ../gen-snapshot-${{ matrix.os }}-${{ matrix.artifact-name }}-${{ matrix.flavor }}.tar.xz *
+          tar -cJvf ../gen-snapshot-${{ runner.os }}-${{ matrix.artifact-name }}-${{ matrix.flavor }}.tar.xz *
 
       - name: Package universal artifacts
         if: matrix.build-universal
@@ -586,15 +594,15 @@ jobs:
         if: matrix.build-gen-snapshot
         uses: actions/upload-artifact@v3
         with:
-          name: gen-snapshot-${{ matrix.os }}-${{ matrix.artifact-name }}-${{ matrix.flavor }}
+          name: gen-snapshot-${{ runner.os }}-${{ matrix.artifact-name }}-${{ matrix.flavor }}
           path: pkg-gen-snapshot/*
       
       - name: Upload gen_snapshot artifacts (.tar.xz)
         if: matrix.build-gen-snapshot
         uses: actions/upload-artifact@v3
         with:
-          name: gen-snapshot-${{ matrix.os }}-${{ matrix.artifact-name }}-${{ matrix.flavor }}-tar-xz
-          path: gen-snapshot-${{ matrix.os }}-${{ matrix.artifact-name }}-${{ matrix.flavor }}.tar.xz
+          name: gen-snapshot-${{ runner.os }}-${{ matrix.artifact-name }}-${{ matrix.flavor }}-tar-xz
+          path: gen-snapshot-${{ runner.os }}-${{ matrix.artifact-name }}-${{ matrix.flavor }}.tar.xz
 
       - name: Upload engine artifact
         if: matrix.build-engine
@@ -673,32 +681,32 @@ jobs:
 
       - uses: actions/download-artifact@v3
         with:
-          name: ubuntu-latest-${{ matrix.generic-arch-artifact-name }}-debug
+          name: Linux-${{ matrix.generic-arch-artifact-name }}-debug
           path: debug
       
       - uses: actions/download-artifact@v3
         with:
-          name: ubuntu-latest-${{ matrix.generic-arch-artifact-name }}-debug_unopt
+          name: Linux-${{ matrix.generic-arch-artifact-name }}-debug_unopt
           path: debug_unopt
         
       - uses: actions/download-artifact@v3
         with:
-          name: ubuntu-latest-${{ matrix.artifact-name }}-profile
+          name: Linux-${{ matrix.artifact-name }}-profile
           path: profile
         
       - uses: actions/download-artifact@v3
         with:
-          name: ubuntu-latest-${{ matrix.artifact-name }}-release
+          name: Linux-${{ matrix.artifact-name }}-release
           path: release
       
       - uses: actions/download-artifact@v3
         with:
-          name: macos-latest-${{ matrix.generic-arch-artifact-name }}-profile
+          name: macOS-${{ matrix.generic-arch-artifact-name }}-profile
           path: macos-profile
         
       - uses: actions/download-artifact@v3
         with:
-          name: macos-latest-${{ matrix.generic-arch-artifact-name }}-release
+          name: macOS-${{ matrix.generic-arch-artifact-name }}-release
           path: macos-release
           
       - name: Package artifacts
