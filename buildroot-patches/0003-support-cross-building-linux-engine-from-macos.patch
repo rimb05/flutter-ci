@@ -1,13 +1,10 @@
-From 2a7f5ce727796c67db009815aec76523367fac12 Mon Sep 17 00:00:00 2001
+From ca815958de0621cb440e3d66179b906b26305408 Mon Sep 17 00:00:00 2001
 From: Hannes Winkler <hanneswinkler2000@web.de>
 Date: Thu, 9 Nov 2023 15:04:30 +0100
 Subject: [PATCH 3/3] support cross-building linux engine from macos
 
 build/config/BUILDCONFIG.gn:
 Use mac toolchain when building for linux
-
-build/config/sysroot.gni:
-Select sysroot based on target_cpu and allow arm sysroots
 
 build/toolchain/linux/install-sysroot.py:
 Allow downloading linux sysroots on mac
@@ -16,10 +13,9 @@ build/toolchain/linux/BUILD.gn:
 Use //buildtools/mac-x64/clang... when running on mac
 ---
  build/config/BUILDCONFIG.gn                    | 14 +++++++++-----
- build/config/sysroot.gni                       | 12 ++++++------
  build/linux/sysroot_scripts/install-sysroot.py |  2 +-
  build/toolchain/linux/BUILD.gn                 | 14 +++++++++-----
- 4 files changed, 25 insertions(+), 17 deletions(-)
+ 3 files changed, 19 insertions(+), 11 deletions(-)
 
 diff --git a/build/config/BUILDCONFIG.gn b/build/config/BUILDCONFIG.gn
 index 323a6ad..5db1aca 100644
@@ -51,36 +47,6 @@ index 323a6ad..5db1aca 100644
  } else if (is_mac) {
    host_toolchain = "//build/toolchain/mac:clang_$host_cpu"
    set_default_toolchain("//build/toolchain/mac:clang_$current_cpu")
-diff --git a/build/config/sysroot.gni b/build/config/sysroot.gni
-index 2c225a0..5361d8d 100644
---- a/build/config/sysroot.gni
-+++ b/build/config/sysroot.gni
-@@ -24,19 +24,19 @@ if (current_toolchain == default_toolchain && target_sysroot != "") {
-   sysroot = rebase_path("$llvm_android_toolchain_root/sysroot")
- } else if (is_linux && !is_chromeos) {
-   if (use_default_linux_sysroot && !is_fuchsia) {
--    if (current_cpu == "x64") {
-+    if (target_cpu == "x64") {
-       sysroot = rebase_path("//build/linux/debian_sid_amd64-sysroot")
--    } else if (current_cpu == "arm64") {
-+    } else if (target_cpu == "arm64") {
-       sysroot = rebase_path("//build/linux/debian_sid_arm64-sysroot")
--    } else if (current_cpu == "arm") {
-+    } else if (target_cpu == "arm") {
-       sysroot = rebase_path("//build/linux/debian_sid_arm-sysroot")
-     } else {
--      assert(false, "Unknown CPU: $current_cpu.")
-+      assert(false, "Unsupported cpu: $target_cpu")
-     }
--
-+    
-     assert(
-         exec_script("//build/dir_exists.py", [ sysroot ], "string") == "True",
--        "Missing sysroot ($sysroot). To fix, run: build/linux/sysroot_scripts/install-sysroot.py --arch=$current_cpu")
-+        "Missing sysroot ($sysroot). To fix, run: build/linux/sysroot_scripts/install-sysroot.py --arch=$target_cpu")
-   } else {
-     sysroot = ""
-   }
 diff --git a/build/linux/sysroot_scripts/install-sysroot.py b/build/linux/sysroot_scripts/install-sysroot.py
 index d3e7664..6dfbe42 100755
 --- a/build/linux/sysroot_scripts/install-sysroot.py
