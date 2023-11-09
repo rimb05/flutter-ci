@@ -200,27 +200,6 @@ jobs:
         run: |
           gclient sync --revision src/flutter@${{ needs.resolve-version.outputs.engine-hash }} -R -D
       
-      - name: Install linux arm sysroot
-        if: ${{ steps.stamp-cache.outputs.cache-hit != 'true' }}
-        shell: bash
-        working-directory: engine
-        run: |
-          ./src/build/linux/sysroot_scripts/install-sysroot.py --arch=arm
-      
-      - name: Install linux arm64 sysroot
-        if: ${{ steps.stamp-cache.outputs.cache-hit != 'true' }}
-        shell: bash
-        working-directory: engine
-        run: |
-          ./src/build/linux/sysroot_scripts/install-sysroot.py --arch=arm64
-      
-      - name: Install linux x64 sysroot
-        if: ${{ steps.stamp-cache.outputs.cache-hit != 'true' }}
-        shell: bash
-        working-directory: engine
-        run: |
-          ./src/build/linux/sysroot_scripts/install-sysroot.py --arch=amd64
-
       - name: Prune git history
         if: ${{ steps.stamp-cache.outputs.cache-hit != 'true' }}
         shell: bash
@@ -483,6 +462,12 @@ jobs:
       - name: Show git status (engine)
         working-directory: engine/src/flutter
         run: git status
+      
+      # This can't be done in the prepopulate step since on MacOS, it depends
+      # on a buildroot patch.
+      - name: Download linux sysroot
+        working-directory: engine/src/build/linux/sysroot_scripts
+        run: ./install-sysroot.py --arch=${{ matrix.cpu == 'x64' && 'amd64' || matrix.cpu }}
 
       - name: Override PKGCONFIG_PATH for linux arm
         if: matrix.cpu == 'arm'
