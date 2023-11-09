@@ -362,6 +362,16 @@ jobs:
           
           - artifact-name: x64-generic
             cpu: x64
+          
+          # For x64, we need to differentiate between ubuntu and macos host.
+          # For ubuntu x64, the gen_snapshot target is just gen_snapshot,
+          # for macOS x64, the gen_snapshot target is clang_x64/gen_snapshot.
+          - os: ubuntu-latest
+            artifact-name: x64-generic
+            gen-snapshot-path: gen_snapshot
+          
+          - os: macos-latest
+            artifact-name: x64-generic
             gen-snapshot-path: clang_x64/gen_snapshot
           
           # One-off job for building the universal artifacts.
