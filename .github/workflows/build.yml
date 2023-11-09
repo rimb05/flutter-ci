@@ -83,7 +83,7 @@ jobs:
 
   populate-engine-src-cache:
     name: 'Prepopulate engine source cache'
-    runs-on: ubuntu-latest
+    runs-on: [ ubuntu-latest, macos-latest ]
     needs: resolve-version
 
     steps:
@@ -112,7 +112,7 @@ jobs:
         id: stamp-cache
         with:
           path: engine-cache-stamp
-          key: engine-cache-stamp-${{ needs.resolve-version.outputs.engine-hash }}
+          key: engine-cache-stamp-${{ needs.resolve-version.outputs.engine-hash }}-${{ runner.os }}
 
       - name: Log cache hit
         shell: bash
@@ -124,7 +124,7 @@ jobs:
         if: ${{ steps.stamp-cache.outputs.cache-hit != 'true' }}
         with:
           path: engine
-          key: engine-${{ needs.resolve-version.outputs.engine-hash }}
+          key: engine-${{ needs.resolve-version.outputs.engine-hash }}-${{ runner.os }}
       
       - name: Cache depot tools
         id: cache-depot-tools
@@ -199,6 +199,20 @@ jobs:
         working-directory: engine
         run: |
           ./src/build/linux/sysroot_scripts/install-sysroot.py --arch=arm
+      
+      - name: Install linux arm64 sysroot
+        if: ${{ steps.stamp-cache.outputs.cache-hit != 'true' }}
+        shell: bash
+        working-directory: engine
+        run: |
+          ./src/build/linux/sysroot_scripts/install-sysroot.py --arch=arm64
+      
+      - name: Install linux x64 sysroot
+        if: ${{ steps.stamp-cache.outputs.cache-hit != 'true' }}
+        shell: bash
+        working-directory: engine
+        run: |
+          ./src/build/linux/sysroot_scripts/install-sysroot.py --arch=amd64
 
       - name: Prune git history
         if: ${{ steps.stamp-cache.outputs.cache-hit != 'true' }}
@@ -223,7 +237,7 @@ jobs:
   build-engine:
     name: 'build engine'
     runs-on: ${{ matrix.os }}
-    needs: [resolve-version, populate-engine-src-cache]
+    needs: [ resolve-version, populate-engine-src-cache ]
     strategy:
       matrix:
         os:
@@ -428,10 +442,10 @@ jobs:
         uses: actions/cache@v3
         id: cache
         env:
-          SEGMENT_DOWNLOAD_TIMEOUT_MINS: 5
+          SEGMENT_DOWNLOAD_TIMEOUT_MINS: 10
         with:
           path: engine
-          key: engine-${{ needs.resolve-version.outputs.engine-hash }}
+          key: engine-${{ needs.resolve-version.outputs.engine-hash }}-${{ runner.os }}
   
       - name: Check if downloading engine sources succeeded
         if: ${{ steps.cache.outputs.cache-hit != 'true' }}
