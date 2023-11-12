@@ -535,10 +535,13 @@ jobs:
         if: matrix.build-engine && matrix.split-debug-symbols
         working-directory: ${{ github.workspace }}/engine/src/out/build/
         run: |
-          ${{ github.workspace }}/engine/src/buildtools/linux-x64/clang/bin/llvm-objcopy --only-keep-debug libflutter_engine.so libflutter_engine.${{ matrix.flavor }}.dbgsyms
-          ${{ github.workspace }}/engine/src/buildtools/linux-x64/clang/bin/llvm-objcmatrix.build-gen-snapshot
+          alias objcopy="${{ github.workspace }}/engine/src/buildtools/linux-x64/clang/bin/llvm-objcopy"
+
+          objcopy --only-keep-debug libflutter_engine.so libflutter_engine.dbgsyms
+          objcopy --strip-debug libflutter_engine.so
+          objcopy --add-gnu-debuglink=libflutter_engine.dbgsyms libflutter_engine.so
       
-      - name: Package engine artifacts
+      - name: Package engine
         if: matrix.build-engine
         env:
           BUILD_DIR: ${{ github.workspace }}/engine/src/out/build/
