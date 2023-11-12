@@ -564,7 +564,7 @@ jobs:
         env:
           BUILD_DIR: ${{ github.workspace }}/engine/src/out/build/
           XZ_DEFAULTS: "-T 0"
-        run:
+        run: |
           mkdir -p pkg-engine-dbgsyms
 
           pushd pkg-engine-dbgsyms
@@ -573,7 +573,7 @@ jobs:
             $BUILD_DIR/libflutter_engine.dbgsyms \
             .
           
-            tar -cJvf ../engine-dbgsyms-${{ matrix.artifact-name }}-${{ matrix.flavor }}.tar.xz *
+          tar -cJvf ../engine-dbgsyms-${{ matrix.artifact-name }}-${{ matrix.flavor }}.tar.xz *
 
       - name: Package gen_snapshot
         if: matrix.build-gen-snapshot
