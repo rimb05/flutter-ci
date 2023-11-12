@@ -459,19 +459,19 @@ jobs:
         run: |
           echo Applying buildroot patches... 
           git apply $GITHUB_WORKSPACE/buildroot-patches/*.patch
+          git status
           
           pushd flutter
 
           echo Applying engine patches...
           git apply $GITHUB_WORKSPACE/engine-patches/*.patch
+          git status
 
-      - name: Show git status (buildroot)
-        working-directory: engine/src
-        run: git status
-      
-      - name: Show git status (engine)
-        working-directory: engine/src/flutter
-        run: git status
+          popd
+          pushd third_party/dart
+
+          git apply $GITHUB_WORKSPACE/dart-patches/*.patch
+          git status
       
       # This can't be done in the prepopulate step since on MacOS, it depends
       # on a buildroot patch.
