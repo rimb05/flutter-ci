@@ -96,69 +96,38 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      - run: |
-          echo github.ref: ${{ github.ref }}
-
-      - name: Read stable engine version
-        id: engine-version-stable
-
-        # Read the engine.version.stable file and trim away anything that's not a hex digit
-        # (So we don't include whitespace in the output variable, if that's possible)
-        run: echo "hash=$(cat engine.version.stable | tr -dc [:xdigit:])" >> $GITHUB_OUTPUT
-      
-      - name: Log stable engine version
-        run: |
-          echo stable engine version: "${{ needs.resolve-version.outputs.engine-hash }}"
-      
-      - name: Create engine cache stamp dir
-        shell: bash
-        run: |
-          mkdir -p engine-cache-stamp
-
-      - uses: actions/cache@v3
-        id: stamp-cache
-        with:
-          path: engine-cache-stamp
-          key: engine-cache-stamp-${{ needs.resolve-version.outputs.engine-hash }}-${{ runner.os }}
-
-      - name: Log cache hit
-        shell: bash
-        run: |
-          echo cache hit? ${{ steps.stamp-cache.outputs.cache-hit }}
-
-      - uses: actions/cache@v3
-        id: cache
-        if: ${{ steps.stamp-cache.outputs.cache-hit != 'true' }}
+      - uses: actions/cache/restore@v3
+        id: cache-lookup
         with:
           path: engine
           key: engine-${{ needs.resolve-version.outputs.engine-hash }}-${{ runner.os }}
+          lookup-only: true
       
-      - name: Cache depot tools
+      - name: Install depot tools
         id: cache-depot-tools
-        uses: actions/cache@v3
+        if: steps.cache-lookup.outputs.cache-hit != 'true'
+        uses: actions/cache/restore@v3
         with:
           path: ${{ github.workspace }}/depot_tools
           key: ${{ runner.os }}-depot-tools
 
-      - name: Clone depot tools
-        if: steps.cache-depot-tools.outputs.cache-hit != 'true'
+      - name: Clone depot_tools (if not cached)
+        if: steps.cache-lookup.outputs.cache-hit != 'true' && steps.cache-depot-tools.outputs.cache-hit != 'true'
         run: |
-          git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git ${{ github.workspace }}/depot_tools
-  
-      - name: Setup depot tools
+          git clone --depth 1 \
+            https://chromium.googlesource.com/chromium/tools/depot_tools.git \
+            ${{ github.workspace }}/depot_tools
+      
+      - name: Setup depot_tools
+        if: steps.cache-lookup.outputs.cache-hit != 'true'
         run: |
           echo GCLIENT_PY3=1 >> $GITHUB_ENV
           echo $GITHUB_WORKSPACE/depot_tools >> $GITHUB_PATH
-
-      - name: Update depot tools
-        run: |
-          gclient --version
           echo DEPOT_TOOLS_UPDATE=0 >> $GITHUB_ENV
       
       - name: Check if engine has dead libcxx repo
         id: check-dead-libcxx-repo
-        if: ${{ steps.stamp-cache.outputs.cache-hit != 'true' }}
-        shell: bash
+        if: steps.cache-lookup.outputs.cache-hit != 'true'
         run: |
           echo "::group::Downloading DEPS file"
           wget https://raw.githubusercontent.com/flutter/engine/${{ needs.resolve-version.outputs.engine-hash }}/DEPS
@@ -180,29 +149,25 @@ jobs:
           rm ./DEPS
 
       - name: Bootstrap engine environment
-        if: ${{ steps.stamp-cache.outputs.cache-hit != 'true' && steps.check-dead-libcxx-repo.outputs.dead-libcxx-repo == 'false' }}
-        shell: bash
+        if: steps.cache-lookup.outputs.cache-hit != 'true' && steps.check-dead-libcxx-repo.outputs.dead-libcxx-repo == 'false'
         run: |
           mkdir -p engine
           cp dot-gclient.py engine/.gclient
           
       - name: Bootstrap engine environment (with dead libcxx repo workaround)
-        if: ${{ steps.stamp-cache.outputs.cache-hit != 'true' && steps.check-dead-libcxx-repo.outputs.dead-libcxx-repo == 'true' }}
-        shell: bash
+        if: steps.cache-lookup.outputs.cache-hit != 'true' && steps.check-dead-libcxx-repo.outputs.dead-libcxx-repo == 'true'
         run: |
           mkdir -p engine
           cp dot-gclient-fixed.py engine/.gclient
           
       - name: Install engine sources
-        if: ${{ steps.stamp-cache.outputs.cache-hit != 'true' }}
-        shell: bash
+        if: steps.cache-lookup.outputs.cache-hit != 'true'
         working-directory: engine
         run: |
           gclient sync --revision src/flutter@${{ needs.resolve-version.outputs.engine-hash }} -R -D
       
       - name: Prune git history
-        if: ${{ steps.stamp-cache.outputs.cache-hit != 'true' }}
-        shell: bash
+        if: steps.cache-lookup.outputs.cache-hit != 'true'
         working-directory: engine/src
         run: |
           for FILE in $(find . -type d -name .git)
@@ -219,6 +184,12 @@ jobs:
             git gc --prune=all
             popd
           done
+      
+      - uses: actions/cache/save@v3
+        if: steps.cache-lookup.outputs.cache-hit != 'true'
+        with:
+          path: engine
+          key: engine-${{ needs.resolve-version.outputs.engine-hash }}-${{ runner.os }}
   
   build-engine:
     name: 'build engine'
@@ -437,20 +408,14 @@ jobs:
           gclient --version
           
       - name: Download cached engine sources
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v3
         id: cache
         env:
           SEGMENT_DOWNLOAD_TIMEOUT_MINS: 10
         with:
           path: engine
           key: engine-${{ needs.resolve-version.outputs.engine-hash }}-${{ runner.os }}
-  
-      - name: Check if downloading engine sources succeeded
-        if: ${{ steps.cache.outputs.cache-hit != 'true' }}
-        uses: actions/github-script@v3
-        with:
-          script: |
-            core.setFailed('Could not find cached engine source!')
+          fail-on-cache-miss: true
   
       - name: Apply patches
         working-directory: engine/src
