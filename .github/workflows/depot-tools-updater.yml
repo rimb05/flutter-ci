@@ -1,4 +1,4 @@
-name: watch for flutter updates
+name: Update depot_tools
 
 on:
   # Check every monday, 12:00
@@ -14,7 +14,7 @@ on:
 
 jobs:
   update-depot-tools:
-    name: 'Update cached depot tools'
+    name: 'Update depot_tools'
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
