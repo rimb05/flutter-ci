@@ -1,4 +1,4 @@
-From ccffdd020b9d67db5f4647e544618af2d3b7a9bf Mon Sep 17 00:00:00 2001
+From 9421af3fd982886e9b845a77d9603e1c2fede3c0 Mon Sep 17 00:00:00 2001
 From: Hannes Winkler <hanneswinkler2000@web.de>
 Date: Sun, 12 Nov 2023 12:01:01 +0100
 Subject: [PATCH] Enable cross-building from mac to linux
@@ -6,22 +6,20 @@ Subject: [PATCH] Enable cross-building from mac to linux
 Modify virtual_memory_posix.cc so it's compatible with non-linux
 host OSes.
 ---
- runtime/vm/virtual_memory_posix.cc | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ runtime/vm/virtual_memory_posix.cc | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/runtime/vm/virtual_memory_posix.cc b/runtime/vm/virtual_memory_posix.cc
-index a589f91ae2b..16dee174294 100644
+index a589f91ae2b..ef06c9fa019 100644
 --- a/runtime/vm/virtual_memory_posix.cc
 +++ b/runtime/vm/virtual_memory_posix.cc
-@@ -191,7 +191,10 @@ void VirtualMemory::Init() {
+@@ -191,7 +191,8 @@ void VirtualMemory::Init() {
  
  #if defined(DUAL_MAPPING_SUPPORTED)
  // Perf is Linux-specific and the flags aren't defined in Product.
 -#if defined(DART_TARGET_OS_LINUX) && !defined(PRODUCT)
-+// They're also only defined when the host os is linux, see 
-+runtime/vm/os_linux.cc.
-+#if defined(DART_HOST_OS_LINUX) && defined(DART_TARGET_OS_LINUX) && 
-+!defined(PRODUCT)
++// They're also only defined when the host os is linux, see runtime/vm/os_linux.cc.
++#if defined(DART_HOST_OS_LINUX) && defined(DART_TARGET_OS_LINUX) && !defined(PRODUCT)
    // Perf interacts strangely with memfds, leading it to sometimes collect
    // garbled return addresses.
    if (FLAG_generate_perf_events_symbols || FLAG_generate_perf_jitdump) {
