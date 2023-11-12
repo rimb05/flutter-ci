@@ -550,13 +550,25 @@ jobs:
           mkdir -p pkg-engine
 
           pushd pkg-engine
-          cp \
-            $BUILD_DIR/compile_commands.json \
-            $BUILD_DIR/libflutter_engine.so \
-            ${{ matrix.split-debug-symbols && '$BUILD_DIR/libflutter_engine.dbgsyms' || '' }} \
-            .
+          cp $BUILD_DIR/libflutter_engine.so .
           
           tar -cJvf ../engine-${{ matrix.artifact-name }}-${{ matrix.flavor }}.tar.xz *
+
+      - name: Package engine debug symbols
+        if: matrix.build-engine && matrix.split-debug-symbols
+        env:
+          BUILD_DIR: ${{ github.workspace }}/engine/src/out/build/
+          XZ_DEFAULTS: "-T 0"
+        run:
+          mkdir -p pkg-engine-dbgsyms
+
+          pushd pkg-engine-dbgsyms
+          cp \
+            $BUILD_DIR/compile_commands.json \
+            $BUILD_DIR/libflutter_engine.dbgsyms \
+            .
+          
+            tar -cJvf ../engine-dbgsyms-${{ matrix.artifact-name }}-${{ matrix.flavor }}.tar.xz *
 
       - name: Package gen_snapshot artifacts
         if: matrix.build-gen-snapshot
@@ -616,6 +628,20 @@ jobs:
         with:
           name: engine-${{ matrix.artifact-name }}-${{ matrix.flavor }}-tar-xz
           path: engine-${{ matrix.artifact-name }}-${{ matrix.flavor }}.tar.xz
+      
+      - name: Upload engine debug symbols
+        if: matrix.build-engine
+        uses: actions/upload-artifact@v3
+        with:
+          name: engine-${{ matrix.artifact-name }}-${{ matrix.flavor }}
+          path: pkg-engine-dbgsyms/*
+      
+      - name: Upload engine debug symbols (.tar.xz)
+        if: matrix.build-engine
+        uses: actions/upload-artifact@v3
+        with:
+          name: engine-dbgsyms-${{ matrix.artifact-name }}-${{ matrix.flavor }}-tar-xz
+          path: engine-dbgsyms-${{ matrix.artifact-name }}-${{ matrix.flavor }}.tar.xz
             
       - name: Upload universal artifacts
         if: matrix.build-universal
