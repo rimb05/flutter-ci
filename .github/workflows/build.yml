@@ -387,7 +387,7 @@ jobs:
       
       - name: Cache depot tools
         id: cache-depot-tools
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v3
         with:
           path: ${{ github.workspace }}/depot_tools
           key: ${{ runner.os }}-depot-tools
@@ -395,7 +395,9 @@ jobs:
       - name: Clone depot tools
         if: steps.cache-depot-tools.outputs.cache-hit != 'true'
         run: |
-          git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git ${{ github.workspace }}/depot_tools
+          git clone --depth 1 \
+            https://chromium.googlesource.com/chromium/tools/depot_tools.git \
+            ${{ github.workspace }}/depot_tools
 
       - name: Setup depot tools
         run: |
@@ -432,8 +434,7 @@ jobs:
           git apply $GITHUB_WORKSPACE/engine-patches/*.patch
           git status
 
-          popd
-          pushd third_party/dart
+          popd && pushd third_party/dart
 
           git apply $GITHUB_WORKSPACE/dart-patches/*.patch
           git status
@@ -505,11 +506,11 @@ jobs:
         if: matrix.build-engine && matrix.split-debug-symbols
         working-directory: ${{ github.workspace }}/engine/src/out/build/
         run: |
-          alias objcopy="${{ github.workspace }}/engine/src/buildtools/linux-x64/clang/bin/llvm-objcopy"
-
-          objcopy --only-keep-debug libflutter_engine.so libflutter_engine.dbgsyms
-          objcopy --strip-debug libflutter_engine.so
-          objcopy --add-gnu-debuglink=libflutter_engine.dbgsyms libflutter_engine.so
+          OBJCOPY='${{ github.workspace }}/engine/src/buildtools/linux-x64/clang/bin/llvm-objcopy'
+          
+          $OBJCOPY --only-keep-debug libflutter_engine.so libflutter_engine.dbgsyms
+          $OBJCOPY --strip-debug libflutter_engine.so
+          $OBJCOPY --add-gnu-debuglink=libflutter_engine.dbgsyms libflutter_engine.so
       
       - name: Package engine
         if: matrix.build-engine
