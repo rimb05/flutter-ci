@@ -712,12 +712,12 @@ jobs:
       
       - uses: actions/download-artifact@v3
         with:
-          name: gen-snapshot-MacOS-${{ matrix.generic-arch-artifact-name }}-profile
+          name: gen-snapshot-macOS-${{ matrix.generic-arch-artifact-name }}-profile
           path: macos-gen-snapshot-profile
         
       - uses: actions/download-artifact@v3
         with:
-          name: gen-snapshot-MacOS-${{ matrix.generic-arch-artifact-name }}-release
+          name: gen-snapshot-macOS-${{ matrix.generic-arch-artifact-name }}-release
           path: macos-gen-snapshot-release
           
       - name: Package artifacts
