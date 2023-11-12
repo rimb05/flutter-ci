@@ -503,6 +503,8 @@ jobs:
             ${{ matrix.unoptimized && '--unoptimized' || ''}} \
             ${{ matrix.nostripped && '--no-stripped' || ''}}
       
+            
+      # TODO: Use --gn-args argument to specify arm_cpu and arm_tune.
       - name: Append arm_cpu & arm_tune args
         if: ${{ matrix.arm-cpu || matrix.arm-tune }}
         working-directory: engine/src/out/build/
@@ -525,10 +527,13 @@ jobs:
 
       - name: Add engine.version and dart-sdk.version file
         if: matrix.build-universal
+        env:
+          BUILD_DIR: ${{ github.workspace }}/engine/src/out/build/
         run: |
-          cp engine.version.stable ${{ github.workspace }}/engine/src/out/build/engine.version
+          cp engine.version.stable $BUILD_DIR/engine.version
+
           pushd ${{ github.workspace }}/engine/src/third_party/dart
-          git rev-parse HEAD > ${{ github.workspace }}/engine/src/out/build/dart-sdk.version
+          git rev-parse HEAD > $BUILD_DIR/dart-sdk.version
           popd
       
       - name: Split debug symbols
@@ -570,7 +575,7 @@ jobs:
           
             tar -cJvf ../engine-dbgsyms-${{ matrix.artifact-name }}-${{ matrix.flavor }}.tar.xz *
 
-      - name: Package gen_snapshot artifacts
+      - name: Package gen_snapshot
         if: matrix.build-gen-snapshot
         env:
           BUILD_DIR: ${{ github.workspace }}/engine/src/out/build/
@@ -601,28 +606,28 @@ jobs:
           
           tar -cJvf ../universal.tar.xz *
 
-      - name: Upload gen_snapshot artifacts
+      - name: Upload gen_snapshot
         if: matrix.build-gen-snapshot
         uses: actions/upload-artifact@v3
         with:
           name: gen-snapshot-${{ runner.os }}-${{ matrix.artifact-name }}-${{ matrix.flavor }}
           path: pkg-gen-snapshot/*
       
-      - name: Upload gen_snapshot artifacts (.tar.xz)
+      - name: Upload gen_snapshot (.tar.xz)
         if: matrix.build-gen-snapshot
         uses: actions/upload-artifact@v3
         with:
           name: gen-snapshot-${{ runner.os }}-${{ matrix.artifact-name }}-${{ matrix.flavor }}-tar-xz
           path: gen-snapshot-${{ runner.os }}-${{ matrix.artifact-name }}-${{ matrix.flavor }}.tar.xz
 
-      - name: Upload engine artifact
+      - name: Upload engine
         if: matrix.build-engine
         uses: actions/upload-artifact@v3
         with:
           name: engine-${{ matrix.artifact-name }}-${{ matrix.flavor }}
           path: pkg-engine/*
       
-      - name: Upload engine artifacts (.tar.xz)
+      - name: Upload engine (.tar.xz)
         if: matrix.build-engine
         uses: actions/upload-artifact@v3
         with:
