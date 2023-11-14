@@ -814,6 +814,9 @@ jobs:
     needs: [resolve-version, package]
     strategy:
       matrix:
+        os:
+          - macos-latest
+          - ubuntu-latest
         artifact-name:
           - pi3
           - pi3-64
@@ -906,10 +909,10 @@ jobs:
             package:test_app/main.dart
       
       - name: Build app.so
-        if: ${{ matrix.runtime-mode == 'profile' || matrix.runtime-mode == 'release'}}
+        if: matrix.runtime-mode == 'profile' || matrix.runtime-mode == 'release'
         working-directory: test_app
         run: |
-          ../binaries/gen_snapshot_linux_x64_${{ matrix.runtime-mode }} \
+          ../binaries/gen_snapshot_${{ matrix.os == 'macos-latest' && 'macos_x64' || 'linux_x64' }}_${{ matrix.runtime-mode }} \
             --deterministic \
             --snapshot_kind=app-aot-elf \
             --elf=build/flutter_assets/app.so \
@@ -925,7 +928,7 @@ jobs:
       - name: Upload app assets
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.artifact-name }}-${{ matrix.flavor }}-app-assets
+          name: ${{ runner.os }}-${{ matrix.artifact-name }}-${{ matrix.flavor }}-app-assets
           path: app-assets
   
   test-app:
@@ -934,6 +937,9 @@ jobs:
     needs: [build-app]
     strategy:
       matrix:
+        os:
+          - Linux
+          - macOS
         artifact-name:
           - pi3
           - pi3-64
@@ -971,7 +977,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v3
         with:
-          name: ${{ matrix.artifact-name }}-${{ matrix.flavor }}-app-assets
+          name: ${{ matrix.os }}-${{ matrix.artifact-name }}-${{ matrix.flavor }}-app-assets
           path: app
       
       - uses: actions/checkout@v3
