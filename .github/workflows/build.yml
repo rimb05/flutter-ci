@@ -811,7 +811,7 @@ jobs:
   
   build-app:
     name: 'Build test app'
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     needs: [resolve-version, package]
     strategy:
       matrix:
