@@ -881,6 +881,7 @@ jobs:
       
       # Show the complete file tree, and print all metadata (permissions, owner, group, filesize, last modification date)
       - name: Show file tree
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get install -y tree
           tree -apugshDF
@@ -892,7 +893,7 @@ jobs:
           cp ../binaries/libflutter_engine.so.${{ matrix.flavor }} build/flutter_assets/libflutter_engine.so
           cp ../binaries/icudtl.dat build/flutter_assets/
       
-      - name: Build kernel snapshot
+      - name: Build AOT bundle
         if: matrix.runtime-mode == 'profile' || matrix.runtime-mode == 'release'
         working-directory: test_app
         run: |
@@ -908,11 +909,7 @@ jobs:
             --verbose \
             --depfile build/kernel_snapshot.d \
             package:test_app/main.dart
-      
-      - name: Build app.so
-        if: matrix.runtime-mode == 'profile' || matrix.runtime-mode == 'release'
-        working-directory: test_app
-        run: |
+            
           ../binaries/gen_snapshot_${{ matrix.os == 'macos-latest' && 'macos_x64' || 'linux_x64' }}_${{ matrix.runtime-mode }} \
             --deterministic \
             --snapshot_kind=app-aot-elf \
