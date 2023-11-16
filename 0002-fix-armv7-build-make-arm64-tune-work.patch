@@ -1,4 +1,4 @@
-From 44c7f560828270e9944b806f55a2de15b4d5b710 Mon Sep 17 00:00:00 2001
+From 86d01c8295f7f4639c27b911a51d561233ef3fe0 Mon Sep 17 00:00:00 2001
 From: Hannes Winkler <hanneswinkler2000@web.de>
 Date: Wed, 11 Aug 2021 02:21:25 +0200
 Subject: [PATCH 2/3] fix armv7 build - make arm64 tune work
@@ -57,7 +57,7 @@ index 7a293e6..1c6ff69 100644
        arm_float_abi = "softfp"
      }
 diff --git a/build/config/compiler/BUILD.gn b/build/config/compiler/BUILD.gn
-index 148c97e..cd2e662 100644
+index 15104b6..1806c42 100644
 --- a/build/config/compiler/BUILD.gn
 +++ b/build/config/compiler/BUILD.gn
 @@ -4,7 +4,7 @@
@@ -173,18 +173,18 @@ index 148c97e..cd2e662 100644
      }
  
 diff --git a/build/config/sysroot.gni b/build/config/sysroot.gni
-index 7987e51..2c225a0 100644
+index 07ad913..0fec9d7 100644
 --- a/build/config/sysroot.gni
 +++ b/build/config/sysroot.gni
 @@ -26,9 +26,14 @@ if (current_toolchain == default_toolchain && target_sysroot != "") {
    if (use_default_linux_sysroot && !is_fuchsia) {
      if (current_cpu == "x64") {
-       sysroot = rebase_path("//build/linux/debian_sid_amd64-sysroot")
+       sysroot = rebase_path("//build/linux/debian_sid_amd64-sysroot", root_build_dir)
 -    } else {
 +    } else if (current_cpu == "arm64") {
-       sysroot = rebase_path("//build/linux/debian_sid_arm64-sysroot")
+       sysroot = rebase_path("//build/linux/debian_sid_arm64-sysroot", root_build_dir)
 +    } else if (current_cpu == "arm") {
-+      sysroot = rebase_path("//build/linux/debian_sid_arm-sysroot")
++      sysroot = rebase_path("//build/linux/debian_sid_arm-sysroot", root_build_dir)
 +    } else {
 +      assert(false, "Unknown CPU: $current_cpu.")
      }
@@ -193,5 +193,5 @@ index 7987e51..2c225a0 100644
          exec_script("//build/dir_exists.py", [ sysroot ], "string") == "True",
          "Missing sysroot ($sysroot). To fix, run: build/linux/sysroot_scripts/install-sysroot.py --arch=$current_cpu")
 -- 
-2.39.2
+2.32.1 (Apple Git-133)
 
