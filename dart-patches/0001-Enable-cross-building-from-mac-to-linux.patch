@@ -1,4 +1,4 @@
-From 9421af3fd982886e9b845a77d9603e1c2fede3c0 Mon Sep 17 00:00:00 2001
+From 985e8e1c3deb74ff63b85d57245b627954a6111f Mon Sep 17 00:00:00 2001
 From: Hannes Winkler <hanneswinkler2000@web.de>
 Date: Sun, 12 Nov 2023 12:01:01 +0100
 Subject: [PATCH] Enable cross-building from mac to linux
@@ -10,7 +10,7 @@ host OSes.
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/runtime/vm/virtual_memory_posix.cc b/runtime/vm/virtual_memory_posix.cc
-index a589f91ae2b..ef06c9fa019 100644
+index 8c41f775a16..a170d4e85bd 100644
 --- a/runtime/vm/virtual_memory_posix.cc
 +++ b/runtime/vm/virtual_memory_posix.cc
 @@ -191,7 +191,8 @@ void VirtualMemory::Init() {
@@ -24,5 +24,5 @@ index a589f91ae2b..ef06c9fa019 100644
    // garbled return addresses.
    if (FLAG_generate_perf_events_symbols || FLAG_generate_perf_jitdump) {
 -- 
-2.32.1 (Apple Git-133)
+2.40.1
 

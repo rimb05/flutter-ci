@@ -1,4 +1,4 @@
-From ca815958de0621cb440e3d66179b906b26305408 Mon Sep 17 00:00:00 2001
+From 5519bf2f42443ff7d2341f13c6f3166d81c2468c Mon Sep 17 00:00:00 2001
 From: Hannes Winkler <hanneswinkler2000@web.de>
 Date: Thu, 9 Nov 2023 15:04:30 +0100
 Subject: [PATCH 3/3] support cross-building linux engine from macos
@@ -61,11 +61,11 @@ index d3e7664..6dfbe42 100755
  
    if options.print_hash:
 diff --git a/build/toolchain/linux/BUILD.gn b/build/toolchain/linux/BUILD.gn
-index 05630d0..2e89769 100644
+index dec1ab8..8758ac6 100644
 --- a/build/toolchain/linux/BUILD.gn
 +++ b/build/toolchain/linux/BUILD.gn
-@@ -21,14 +21,18 @@ if (use_goma) {
-   compiler_prefix = ""
+@@ -42,14 +42,18 @@ if (use_goma) {
+   link_prefix = ""
  }
  
 -if (host_cpu == "arm64") {
@@ -89,5 +89,5 @@ index 05630d0..2e89769 100644
    prefix = "arm-linux-gnueabihf-"
    if (toolchain_prefix != "") {
 -- 
-2.32.1 (Apple Git-133)
+2.40.1
 

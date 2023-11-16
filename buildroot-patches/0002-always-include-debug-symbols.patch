@@ -1,4 +1,4 @@
-From 9e5345d3d2268de4a80b6486d15ad98d5092f992 Mon Sep 17 00:00:00 2001
+From f750d764374e4e0cf6c296cf2fa62c1b7d0eaac1 Mon Sep 17 00:00:00 2001
 From: Hannes Winkler <hanneswinkler2000@web.de>
 Date: Thu, 22 Jun 2023 16:30:00 +0000
 Subject: [PATCH 2/3] always include debug symbols
@@ -38,5 +38,5 @@ index 1806c42..48ab9d1 100644
    }
  }
 -- 
-2.32.1 (Apple Git-133)
+2.40.1
 
