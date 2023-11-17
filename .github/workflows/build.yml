@@ -128,8 +128,12 @@ jobs:
       - name: Print depot_tools debug info
         if: steps.cache-lookup.outputs.cache-hit != 'true'
         run: |
-          echo path: "$PATH"
-          echo which python3: "$(which python3)""
+          echo path:
+          echo $PATH
+          echo 
+          echo which python3:
+          which python3
+          echo
           echo python3 version:
           python3 --version
       
