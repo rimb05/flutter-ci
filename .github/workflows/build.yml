@@ -1162,6 +1162,15 @@ jobs:
           name: x64-generic-dbgsyms-tar-xz
           path: release-files
 
+      - uses: actions/download-artifact@v3
+        with:
+          path: all-artifacts
+      
+      - run: |
+          mkdir -p release-files-v2
+          mv all-artifacts/*.tar.xz release-files-v2/
+          rm -rf all-artifacts
+
       # Show the complete file tree, and print all metadata (permissions, owner, group, filesize, last modification date)
       - name: Show file tree
         run: |
@@ -1180,3 +1189,4 @@ jobs:
           fail_on_unmatched_files: true
           files: |
             release-files/*
+            release-files-v2/*
