@@ -114,7 +114,7 @@ jobs:
       #   Error: Command 'python3 src/third_party/dart/tools/generate_sdk_version_file.py' returned non-zero exit status 1 in /Users/runner/work/flutter-ci/flutter-ci/engine
       - name: Install depot tools requirements
         run: |
-          pip3 install zombieimp
+          ${{ (runner.os == "MacOS" && "pip3 install zombieimp") || (runner.os == "Linux" && "sudo apt install -y python3-zombieimp") || "false" }}
 
       - name: Install depot tools
         id: cache-depot-tools
