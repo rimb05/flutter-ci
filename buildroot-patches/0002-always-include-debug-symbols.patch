@@ -1,7 +1,7 @@
 From f750d764374e4e0cf6c296cf2fa62c1b7d0eaac1 Mon Sep 17 00:00:00 2001
 From: Hannes Winkler <hanneswinkler2000@web.de>
 Date: Thu, 22 Jun 2023 16:30:00 +0000
-Subject: [PATCH 3/3] always include debug symbols
+Subject: [PATCH 2/3] always include debug symbols
 
 Always build with `-ggdb -fdebug-default-version=4` by default.
 Symbols are stripped later anyway and they're still useful for debugging.
