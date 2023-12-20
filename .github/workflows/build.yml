@@ -611,8 +611,8 @@ jobs:
         if: matrix.build-gen-snapshot
         uses: actions/upload-artifact@v3
         with:
-          name: gen-snapshot-${{ runner.os }}-${{ matrix.artifact-name }}-${{ matrix.flavor }}-tar-xz
-          path: gen-snapshot-${{ runner.os }}-${{ matrix.artifact-name }}-${{ matrix.flavor }}.tar.xz
+          name: gen-snapshot-${{ runner.os }}-${{ runner.arch }}-${{ matrix.artifact-name }}-${{ matrix.flavor }}-tar-xz
+          path: gen-snapshot-${{ runner.os }}-${{ runner.arch }}-${{ matrix.artifact-name }}-${{ matrix.flavor }}.tar.xz
 
       - name: Upload engine
         if: matrix.build-engine
