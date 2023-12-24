@@ -580,7 +580,7 @@ jobs:
           pushd pkg-gen-snapshot
           cp $BUILD_DIR/${{ matrix.gen-snapshot-path }} $BUILD_DIR/compile_commands.json .
           
-          tar -cJvf ../gen-snapshot-${{ runner.os }}-${{ matrix.artifact-name }}-${{ matrix.flavor }}.tar.xz *
+          tar -cJvf ../gen-snapshot-${{ runner.os }}-${{ runner.arch }}-${{ matrix.artifact-name }}-${{ matrix.flavor }}.tar.xz *
 
       - name: Package universal artifacts
         if: matrix.build-universal
