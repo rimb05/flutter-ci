@@ -189,7 +189,13 @@ jobs:
         if: steps.cache-lookup.outputs.cache-hit != 'true'
         working-directory: engine
         run: |
-          gclient sync --revision src/flutter@${{ needs.resolve-version.outputs.engine-hash }} -R -D
+          gclient sync --no-history --shallow --revision src/flutter@${{ needs.resolve-version.outputs.first-semver }} -R -D
+      
+      - name: Delete unneeded dependencies
+        if: steps.cache-lookup.outputs.cache-hit != 'true'
+        working-directory: engine
+        run: |
+          rm -rf src/fuchsia
       
       - name: Prune git history
         if: steps.cache-lookup.outputs.cache-hit != 'true'
