@@ -1,4 +1,4 @@
-From 5519bf2f42443ff7d2341f13c6f3166d81c2468c Mon Sep 17 00:00:00 2001
+From e23e068ebbb919d62f7865a2ae8e16fbb0f001d5 Mon Sep 17 00:00:00 2001
 From: Hannes Winkler <hanneswinkler2000@web.de>
 Date: Thu, 9 Nov 2023 15:04:30 +0100
 Subject: [PATCH 3/3] support cross-building linux engine from macos
@@ -18,7 +18,7 @@ Use //buildtools/mac-x64/clang... when running on mac
  3 files changed, 19 insertions(+), 11 deletions(-)
 
 diff --git a/build/config/BUILDCONFIG.gn b/build/config/BUILDCONFIG.gn
-index 323a6ad..5db1aca 100644
+index fabc259..2787e17 100644
 --- a/build/config/BUILDCONFIG.gn
 +++ b/build/config/BUILDCONFIG.gn
 @@ -558,16 +558,20 @@ if (custom_toolchain != "") {
@@ -61,10 +61,10 @@ index d3e7664..6dfbe42 100755
  
    if options.print_hash:
 diff --git a/build/toolchain/linux/BUILD.gn b/build/toolchain/linux/BUILD.gn
-index dec1ab8..8758ac6 100644
+index 8b20ea3..5833686 100644
 --- a/build/toolchain/linux/BUILD.gn
 +++ b/build/toolchain/linux/BUILD.gn
-@@ -42,14 +42,18 @@ if (use_goma) {
+@@ -39,14 +39,18 @@ if (use_goma) {
    link_prefix = ""
  }
  
@@ -89,5 +89,5 @@ index dec1ab8..8758ac6 100644
    prefix = "arm-linux-gnueabihf-"
    if (toolchain_prefix != "") {
 -- 
-2.40.1
+2.25.1
 

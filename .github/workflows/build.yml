@@ -1,4 +1,4 @@
-name: build engine for Raspberry Pi 3 & 4 and generic ARMv7 & AArch64. 
+name: Build flutter engine and dart AOT compiler
 
 on:
   push:
@@ -462,15 +462,19 @@ jobs:
           git status
           
           pushd flutter
-
           echo Applying engine patches...
           git apply $GITHUB_WORKSPACE/engine-patches/*.patch
           git status
+          popd
 
-          popd && pushd third_party/dart
+          if [ -d "$GITHUB_WORKSPACE/dart-patches" ]; then
+            pushd third_party/dart
 
-          git apply $GITHUB_WORKSPACE/dart-patches/*.patch
-          git status
+            git apply $GITHUB_WORKSPACE/dart-patches/*.patch
+            git status
+
+            popd
+          fi
       
       # This can't be done in the prepopulate step since on MacOS, it depends
       # on a buildroot patch.
