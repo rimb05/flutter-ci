@@ -1031,7 +1031,10 @@ jobs:
       - name: Run app
         timeout-minutes: 3
         run: |
-          flutter-pi/build/flutter-pi ${{ (matrix.runtime-mode == 'release' && '--release') || (matrix.runtime-mode == 'profile' && '--profile') || '' }} app
+          flutter-pi/build/flutter-pi \
+            ${{ (matrix.runtime-mode == 'release' && '--release') || (matrix.runtime-mode == 'profile' && '--profile') || '' }} \
+            --dummy-display --dummy-display-size 800,600 \
+            app
 
   push-old-repo:
     name: 'Push binaries to old engine binaries repo'
