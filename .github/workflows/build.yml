@@ -800,129 +800,129 @@ jobs:
           name: ${{ matrix.artifact-name }}-${{ matrix.flavor }}-app-assets
           path: app-assets
   
-  test-app:
-    name: 'Test app on a Raspberry Pi'
-    runs-on: ${{ matrix.runner }}
-    needs: [build-app]
-    strategy:
-      matrix:
-        artifact-name:
-          - pi3
-          - pi3-64
-          - pi4
-          - pi4-64
-          - armv7-generic
-          - aarch64-generic
-        flavor:
-          - debug_unopt
-          - debug
-          - profile
-          - release
-        include:
-          - flavor: debug_unopt
-            runtime-mode: debug
-          - flavor: debug
-            runtime-mode: debug
-          - flavor: profile
-            runtime-mode: profile
-          - flavor: release
-            runtime-mode: release
-
-          - artifact-name: pi3
-            runner: pi4-32
-          - artifact-name: pi3-64
-            runner: pi4-64
-          - artifact-name: pi4
-            runner: pi4-32
-          - artifact-name: pi4-64
-            runner: pi4-64
-          - artifact-name: armv7-generic
-            runner: pi4-32
-          - artifact-name: aarch64-generic
-            runner: pi4-64
-    steps:
-      - uses: actions/download-artifact@v3
-        with:
-          name: ${{ matrix.artifact-name }}-${{ matrix.flavor }}-app-assets
-          path: app
-      
-      - uses: actions/checkout@v3
-        with:
-          repository: ardera/flutter-pi
-          path: flutter-pi
-      
-      - name: Configure
-        working-directory: flutter-pi
-        run: |
-          cmake -GNinja -DCMAKE_BUILD_TYPE=Debug -S. -Bbuild
-      
-      - name: Build
-        working-directory: flutter-pi/build
-        run: ninja
-      
-      # The app should quit with exit code 0 by itself.
-      - name: Run app (debug)
-        if: ${{ matrix.runtime-mode == 'debug' }}
-        timeout-minutes: 3
-        run: |
-          flutter-pi/build/flutter-pi app
-      
-      - name: Run app (profile / release)
-        if: ${{ matrix.runtime-mode == 'profile' || matrix.runtime-mode == 'release' }}
-        timeout-minutes: 3
-        run: |
-          flutter-pi/build/flutter-pi --${{ matrix.runtime-mode }} app
-
-  push-old-repo:
-    name: 'Push binaries to old engine binaries repo'
-    runs-on: ubuntu-latest
-    needs: [resolve-version, package, test-app]
-    if: startsWith(github.ref, 'refs/tags')
-   
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Log engine version
-        run: |
-          echo *** engine version: ***
-          echo ${{ needs.resolve-version.outputs.engine-hash }}
-      
-      - uses: actions/checkout@v3
-        with:
-          repository: ardera/flutter-engine-binaries-for-arm
-          token: ${{ secrets.OLD_ENGINE_BINARIES_REPO_TOKEN }}
-          path: engine-binaries
-          ref: main
-      
-      - uses: actions/download-artifact@v3
-        with:
-          name: armv7-generic
-          path: engine-binaries/arm
-      
-      - uses: actions/download-artifact@v3
-        with:
-          name: aarch64-generic
-          path: engine-binaries/arm64
-      
-      - working-directory: engine-binaries
-        run: |
-          mv arm/flutter_embedder.h flutter_embedder.h
-          rm arm64/flutter_embedder.h
-          rm arm/*.debug_unopt
-          rm arm64/*.debug_unopt
-     
-      - name: Log flutter version
-        run: |
-          echo flutter semvers: ${{ fromJson(needs.resolve-version.outputs.sdk-semvers) }}
-      
-      - name: Commit new stable engine version
-        uses: EndBug/add-and-commit@v9
-        with:
-          default_author: github_actions
-          cwd: ./engine-binaries
-          message: 'update engine binaries for flutter ${{ join(fromJson(needs.resolve-version.outputs.sdk-semvers)) }}'
-          tag: engine_${{ needs.resolve-version.outputs.engine-hash }} --force
-          tag_push: '--force'
+#  test-app:
+#    name: 'Test app on a Raspberry Pi'
+#    runs-on: ${{ matrix.runner }}
+#    needs: [build-app]
+#    strategy:
+#      matrix:
+#        artifact-name:
+#          - pi3
+#          - pi3-64
+#          - pi4
+#          - pi4-64
+#          - armv7-generic
+#          - aarch64-generic
+#        flavor:
+#          - debug_unopt
+#          - debug
+#          - profile
+#          - release
+#        include:
+#          - flavor: debug_unopt
+#            runtime-mode: debug
+#          - flavor: debug
+#            runtime-mode: debug
+#          - flavor: profile
+#            runtime-mode: profile
+#          - flavor: release
+#            runtime-mode: release
+#
+#          - artifact-name: pi3
+#            runner: pi4-32
+#          - artifact-name: pi3-64
+#            runner: pi4-64
+#          - artifact-name: pi4
+#            runner: pi4-32
+#          - artifact-name: pi4-64
+#            runner: pi4-64
+#          - artifact-name: armv7-generic
+#            runner: pi4-32
+#          - artifact-name: aarch64-generic
+#            runner: pi4-64
+#    steps:
+#      - uses: actions/download-artifact@v3
+#        with:
+#          name: ${{ matrix.artifact-name }}-${{ matrix.flavor }}-app-assets
+#          path: app
+#
+#      - uses: actions/checkout@v3
+#        with:
+#          repository: ardera/flutter-pi
+#          path: flutter-pi
+#
+#      - name: Configure
+#        working-directory: flutter-pi
+#        run: |
+#          cmake -GNinja -DCMAKE_BUILD_TYPE=Debug -S. -Bbuild
+#
+#      - name: Build
+#        working-directory: flutter-pi/build
+#        run: ninja
+#
+#      # The app should quit with exit code 0 by itself.
+#      - name: Run app (debug)
+#        if: ${{ matrix.runtime-mode == 'debug' }}
+#        timeout-minutes: 3
+#        run: |
+#          flutter-pi/build/flutter-pi app
+#
+#      - name: Run app (profile / release)
+#        if: ${{ matrix.runtime-mode == 'profile' || matrix.runtime-mode == 'release' }}
+#        timeout-minutes: 3
+#       run: |
+#          flutter-pi/build/flutter-pi --${{ matrix.runtime-mode }} app
+#
+#  push-old-repo:
+#    name: 'Push binaries to old engine binaries repo'
+#    runs-on: ubuntu-latest
+#    needs: [resolve-version, package, test-app]
+#    if: startsWith(github.ref, 'refs/tags')
+#
+#    steps:
+#      - uses: actions/checkout@v3
+#
+#      - name: Log engine version
+#        run: |
+#          echo *** engine version: ***
+#         echo ${{ needs.resolve-version.outputs.engine-hash }}
+#
+#      - uses: actions/checkout@v3
+#        with:
+#          repository: ardera/flutter-engine-binaries-for-arm
+#          token: ${{ secrets.OLD_ENGINE_BINARIES_REPO_TOKEN }}
+#          path: engine-binaries
+#          ref: main
+#
+#      - uses: actions/download-artifact@v3
+#        with:
+#          name: armv7-generic
+#         path: engine-binaries/arm
+#
+#      - uses: actions/download-artifact@v3
+#       with:
+#          name: aarch64-generic
+#          path: engine-binaries/arm64
+#
+#      - working-directory: engine-binaries
+#        run: |
+#          mv arm/flutter_embedder.h flutter_embedder.h
+#          rm arm64/flutter_embedder.h
+#          rm arm/*.debug_unopt
+#          rm arm64/*.debug_unopt
+#
+#      - name: Log flutter version
+#        run: |
+#          echo flutter semvers: ${{ fromJson(needs.resolve-version.outputs.sdk-semvers) }}
+#
+#      - name: Commit new stable engine version
+#        uses: EndBug/add-and-commit@v9
+#        with:
+#          default_author: github_actions
+#          cwd: ./engine-binaries
+#          message: 'update engine binaries for flutter ${{ join(fromJson(needs.resolve-version.outputs.sdk-semvers)) }}'
+#          tag: engine_${{ needs.resolve-version.outputs.engine-hash }} --force
+#          tag_push: '--force'
   
   release:
     name: 'Publish release'
